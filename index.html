@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Industrial Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f6f9;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 220px;
+      height: 100%;
+      background-color: #2c3e50;
+      padding-top: 20px;
+      color: white;
+    }
+
+    .sidebar h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 24px;
+    }
+
+    .sidebar a {
+      display: block;
+      color: white;
+      padding: 15px;
+      text-decoration: none;
+      transition: 0.3s;
+    }
+
+    .sidebar a:hover {
+      background-color: #34495e;
+    }
+
+    .main {
+      margin-left: 220px;
+      padding: 20px;
+    }
+
+    .navbar {
+      background-color: #ecf0f1;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .card h3 {
+      margin: 0;
+      font-size: 18px;
+      color: #333;
+    }
+
+    .card p {
+      font-size: 28px;
+      margin: 10px 0 0;
+      color: #2980b9;
+    }
+
+    .chart-container {
+      margin-top: 30px;
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar">
+    <h2><i class="fas fa-industry"></i> INDUSTRIAL</h2>
+    <a href="#"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+    <a href="#"><i class="fas fa-thermometer-half"></i> Sensors</a>
+    <a href="#"><i class="fas fa-chart-line"></i> Reports</a>
+    <a href="#"><i class="fas fa-cogs"></i> Settings</a>
+  </div>
+
+  <div class="main">
+    <div class="navbar">
+      <h2>Real-Time Dashboard</h2>
+      <span>Last Updated: <span id="lastUpdate">--:--:--</span></span>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <h3>Temperature</h3>
+        <p id="tempVal">72°C</p>
+      </div>
+      <div class="card">
+        <h3>Pressure</h3>
+        <p id="pressureVal">1.2 bar</p>
+      </div>
+      <div class="card">
+        <h3>Efficiency</h3>
+        <p id="efficiencyVal">87%</p>
+      </div>
+      <div class="card">
+        <h3>Machine Status</h3>
+        <p id="machineStatus">Running</p>
+      </div>
+    </div>
+
+    <div class="chart-container">
+      <h3>Temperature Trend</h3>
+      <canvas id="tempChart" height="100"></canvas>
+    </div>
+  </div>
+
+  <script>
+    // Simulate real-time data update
+    function updateDashboard() {
+      const temp = (60 + Math.random() * 20).toFixed(1);
+      const pressure = (1 + Math.random() * 0.5).toFixed(2);
+      const efficiency = (80 + Math.random() * 10).toFixed(1);
+      const status = Math.random() > 0.2 ? "Running" : "Stopped";
+
+      document.getElementById("tempVal").textContent = temp + "°C";
+      document.getElementById("pressureVal").textContent = pressure + " bar";
+      document.getElementById("efficiencyVal").textContent = efficiency + "%";
+      document.getElementById("machineStatus").textContent = status;
+
+      const now = new Date();
+      document.getElementById("lastUpdate").textContent = now.toLocaleTimeString();
+
+      // Update chart
+      if (tempChart.data.labels.length > 20) {
+        tempChart.data.labels.shift();
+        tempChart.data.datasets[0].data.shift();
+      }
+      tempChart.data.labels.push(now.toLocaleTimeString());
+      tempChart.data.datasets[0].data.push(temp);
+      tempChart.update();
+    }
+
+    // Chart.js setup
+    const ctx = document.getElementById('tempChart').getContext('2d');
+    const tempChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'Temperature (°C)',
+          data: [],
+          fill: false,
+          borderColor: 'rgba(41, 128, 185, 1)',
+          tension: 0.3
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: false
+          }
+        }
+      }
+    });
+
+    // Start updating every 5 seconds
+    updateDashboard();
+    setInterval(updateDashboard, 5000);
+  </script>
+
+</body>
+</html>
+
